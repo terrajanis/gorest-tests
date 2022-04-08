@@ -8,7 +8,10 @@ import com.github.victools.jsonschema.module.jackson.JacksonModule;
 import com.github.victools.jsonschema.module.javax.validation.JavaxValidationModule;
 import io.restassured.response.Response;
 import org.testng.Assert;
+import org.testng.asserts.SoftAssert;
 import ru.yandex.qatools.allure.annotations.Step;
+
+import java.util.Objects;
 
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchema;
 
@@ -41,5 +44,12 @@ public class AssertHelper {
         JsonNode jsonSchema = generator.generateSchema(clazz);
 
         return jsonSchema.toString();
+    }
+
+    @Step("Check that two values are equal")
+    public static <T> void compareTwoValues(T firstValue, T secondValue) {
+        Assert.assertEquals(firstValue, secondValue, String.format("Values %s и %s are not equal",
+                Objects.isNull(firstValue) ? "null" : firstValue,
+                Objects.isNull(secondValue) ? "null" : secondValue));
     }
 }

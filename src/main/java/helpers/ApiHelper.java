@@ -64,6 +64,15 @@ public class ApiHelper {
         return response;
     }
 
+    @Step("Send get request")
+    public static Response get(String path, Map<String, String> params) {
+        Response response = getBaseRequest()
+                .queryParams(params)
+                .get(path);
+        logResponse(response);
+        return response;
+    }
+
     @Step("Send put request")
     public static Response put(String path, Object o) {
         Response response = getBaseRequest()
