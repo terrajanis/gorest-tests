@@ -113,4 +113,103 @@ public class UsersTests extends BaseTest {
         final Response response = ApiHelper.get(path + "/0", Collections.singletonMap("Authorization", "Bearer " + BASE_TOKEN));
         checkStatusCode(response, HttpStatus.SC_NOT_FOUND);
     }
+
+    @Test(dependsOnMethods = "getExistingUser",
+            dataProvider = "usersPositive",
+            dataProviderClass = DataProviders.class)
+    @Description("Send put request to edit user")
+    public void editUser(User user) {
+        final Response response = ApiHelper.put(path + "/" + userFromResponse.getId(), user, Collections.singletonMap("Authorization", "Bearer " + BASE_TOKEN));
+        checkStatusCode(response, HttpStatus.SC_OK);
+        checkResponseJsonSchema(response, User.class);
+        User editedUser = response.as(User.class);
+        compareTwoValues(editedUser, user);
+    }
+
+    @Test(dependsOnMethods = "getExistingUser",
+            dataProvider = "usersNegative",
+            dataProviderClass = DataProviders.class)
+    @Description("Send put request to edit user with invalid data")
+    public void editUserWithInvalid(User user, String field, String message) {
+        final Response response = ApiHelper.put(path + "/" + userFromResponse.getId(), user, Collections.singletonMap("Authorization", "Bearer " + BASE_TOKEN));
+        checkStatusCode(response, HttpStatus.SC_UNPROCESSABLE_ENTITY);
+        checkError(response, field, message);
+    }
+
+    @Test(dependsOnMethods = "getExistingUser")
+    @Description("Send put request to edit user without authorization")
+    public void editUserWithoutAuth() {
+        User user = getUser("Name", getRandomEmail(), "female", "active");
+        final Response response = ApiHelper.put(path + "/" + userFromResponse.getId(), user);
+        checkStatusCode(response, HttpStatus.SC_NOT_FOUND); // looks like a bug, should be 401
+    }
+
+    @Test
+    @Description("Send put request to edit non-existent user")
+    public void editNonExistentUser() {
+        User user = getUser("Name", getRandomEmail(), "female", "active");
+        final Response response = ApiHelper.put(path + "/0", user, Collections.singletonMap("Authorization", "Bearer " + BASE_TOKEN));
+        checkStatusCode(response, HttpStatus.SC_NOT_FOUND);
+    }
+
+    @Test(dependsOnMethods = "editUser",
+            dataProvider = "usersPositive",
+            dataProviderClass = DataProviders.class)
+    @Description("Send patch request to edit user")
+    public void editUserWithPatch(User user) { // PATCH works the same as PUT, partial update isn't supported
+        final Response response = ApiHelper.patch(path + "/" + userFromResponse.getId(), user, Collections.singletonMap("Authorization", "Bearer " + BASE_TOKEN));
+        checkStatusCode(response, HttpStatus.SC_OK);
+        checkResponseJsonSchema(response, User.class);
+        User editedUser = response.as(User.class);
+        compareTwoValues(editedUser, user);
+    }
+
+    @Test(dependsOnMethods = "getExistingUser",
+            dataProvider = "usersNegative",
+            dataProviderClass = DataProviders.class)
+    @Description("Send patch request to edit user with invalid data")
+    public void editUserWithInvalidWithPatch(User user, String field, String message) {
+        final Response response = ApiHelper.patch(path + "/" + userFromResponse.getId(), user, Collections.singletonMap("Authorization", "Bearer " + BASE_TOKEN));
+        checkStatusCode(response, HttpStatus.SC_UNPROCESSABLE_ENTITY);
+        checkError(response, field, message);
+    }
+
+    @Test(dependsOnMethods = "getExistingUser")
+    @Description("Send patch request to edit user without authorization")
+    public void editUserWithoutAuthWithPatch() {
+        User user = getUser("Name", getRandomEmail(), "female", "active");
+        final Response response = ApiHelper.patch(path + "/" + userFromResponse.getId(), user);
+        checkStatusCode(response, HttpStatus.SC_NOT_FOUND); // looks like a bug, should be 401
+    }
+
+    @Test
+    @Description("Send patch request to edit non-existent user")
+    public void editNonExistentUserWithPatch() {
+        User user = getUser("Name", getRandomEmail(), "female", "active");
+        final Response response = ApiHelper.patch(path + "/0", user, Collections.singletonMap("Authorization", "Bearer " + BASE_TOKEN));
+        checkStatusCode(response, HttpStatus.SC_NOT_FOUND);
+    }
+
+    @Test(dependsOnMethods = "editUserWithPatch")
+    @Description("Send delete request to delete user")
+    public void deleteUser() {
+        final Response response = ApiHelper.delete(path + "/" + userFromResponse.getId(), Collections.singletonMap("Authorization", "Bearer " + BASE_TOKEN));
+        checkStatusCode(response, HttpStatus.SC_NO_CONTENT);
+        final Response getResponse = ApiHelper.getWithAuth(path + "/" + userFromResponse.getId(), Collections.singletonMap("Authorization", "Bearer " + BASE_TOKEN));
+        checkStatusCode(getResponse, HttpStatus.SC_NOT_FOUND);
+    }
+
+    @Test
+    @Description("Send delete request to delete non-existent user")
+    public void deleteNonExistentUser() {
+        final Response response = ApiHelper.delete(path + "/0", Collections.singletonMap("Authorization", "Bearer " + BASE_TOKEN));
+        checkStatusCode(response, HttpStatus.SC_NOT_FOUND);
+    }
+
+    @Test(dependsOnMethods = "editUserWithPatch")
+    @Description("Send delete request to delete user without authorization")
+    public void deleteUserWithoutAuth() {
+        final Response response = ApiHelper.delete(path + "/" + userFromResponse.getId());
+        checkStatusCode(response, HttpStatus.SC_NOT_FOUND); // looks like a bug, should be 401
+    }
 }

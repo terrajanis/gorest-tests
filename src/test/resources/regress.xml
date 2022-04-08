@@ -1,0 +1,9 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="Regress" verbose="1" >
+    <test name="Users">
+        <classes>
+            <class name="tests.UsersTests"/>
+        </classes>
+    </test>
+</suite>

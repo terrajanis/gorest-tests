@@ -114,10 +114,18 @@ public class ApiHelper {
 
 
     @Step("Send delete request")
-    public static Response delete(String path, Map<String, String> headers, Map<String, String> cookies) {
+    public static Response delete(String path, Map<String, String> headers) {
         Response response = getBaseRequest()
-                .headers(new Headers(getHeaders(headers)))
-                .cookies(cookies)
+                .headers(headers)
+                .delete(path);
+        logResponse(response);
+        return response;
+    }
+
+
+    @Step("Send delete request")
+    public static Response delete(String path) {
+        Response response = getBaseRequest()
                 .delete(path);
         logResponse(response);
         return response;
@@ -127,13 +135,5 @@ public class ApiHelper {
         return  given().log().all(true)
                 .filter(new AllureRestAssuredFilter())
                 .contentType(APPLICATION_JSON);
-    }
-
-    private static List<Header> getHeaders(Map<String, String> headers) {
-        List<Header> headersList = new ArrayList<>();
-        for (Map.Entry<String, String> header : headers.entrySet()) {
-            headersList.add(new Header(header.getKey(), header.getValue()));
-        }
-        return  headersList;
     }
 }
