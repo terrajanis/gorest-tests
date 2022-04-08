@@ -83,10 +83,34 @@ public class UsersTests extends BaseTest {
     }
 
     @Test
-    @Description("Send post request to create a user with existing email")
+    @Description("Send post request to create a user without authorization")
     public void createUserWithoutAuth() {
         User user = getUser("Name", getRandomEmail(), "female", "active");
         final Response response = ApiHelper.post(path, user);
         checkStatusCode(response, HttpStatus.SC_UNAUTHORIZED);
+    }
+
+    @Test(dependsOnMethods = "createUser")
+    @Description("Send get request to get user")
+    public void getExistingUser() {
+        final Response response = ApiHelper.getWithAuth(path + "/" + userFromResponse.getId(), Collections.singletonMap("Authorization", "Bearer " + BASE_TOKEN));
+        checkStatusCode(response, HttpStatus.SC_OK);
+        checkResponseJsonSchema(response, User.class);
+        User receivedUser = response.as(User.class);
+        compareTwoValues(receivedUser, userFromResponse);
+    }
+
+    @Test(dependsOnMethods = "createUser")
+    @Description("Send get request to get user without authorization")
+    public void getUserWithoutAuth() {
+        final Response response = ApiHelper.get(path + "/" + userFromResponse.getId());
+        checkStatusCode(response, HttpStatus.SC_NOT_FOUND); // looks like a bug, should be 401
+    }
+
+    @Test
+    @Description("Send get request to get non-existent user")
+    public void getNonExistentUser() {
+        final Response response = ApiHelper.get(path + "/0", Collections.singletonMap("Authorization", "Bearer " + BASE_TOKEN));
+        checkStatusCode(response, HttpStatus.SC_NOT_FOUND);
     }
 }

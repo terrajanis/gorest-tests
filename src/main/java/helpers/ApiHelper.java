@@ -57,10 +57,9 @@ public class ApiHelper {
     }
 
     @Step("Send get request")
-    public static Response get(String path, Map<String, String> headers, Map<String, String> cookies) {
+    public static Response getWithAuth(String path, Map<String, String> headers) {
         Response response = getBaseRequest()
-                .headers(new Headers(getHeaders(headers)))
-                .cookies(cookies)
+                .headers(headers)
                 .get(path);
         logResponse(response);
         return response;
@@ -76,6 +75,16 @@ public class ApiHelper {
     }
 
     @Step("Send put request")
+    public static Response put(String path, Object o, Map<String,String> headers) {
+        Response response = getBaseRequest()
+                .headers(headers)
+                .body(o)
+                .put(path);
+        logResponse(response);
+        return response;
+    }
+
+    @Step("Send put request")
     public static Response put(String path, Object o) {
         Response response = getBaseRequest()
                 .body(o)
@@ -84,16 +93,25 @@ public class ApiHelper {
         return response;
     }
 
-    @Step("Send put request")
-    public static Response put(String path, Map<String, String> headers, Map<String, String> cookies, Map<String,String> params) {
+    @Step("Send patch request")
+    public static Response patch(String path, Object o, Map<String,String> headers) {
         Response response = getBaseRequest()
-                .headers(new Headers(getHeaders(headers)))
-                .cookies(cookies)
-                .queryParams(params)
-                .put(path);
+                .headers(headers)
+                .body(o)
+                .patch(path);
         logResponse(response);
         return response;
     }
+
+    @Step("Send patch request")
+    public static Response patch(String path, Object o) {
+        Response response = getBaseRequest()
+                .body(o)
+                .patch(path);
+        logResponse(response);
+        return response;
+    }
+
 
     @Step("Send delete request")
     public static Response delete(String path, Map<String, String> headers, Map<String, String> cookies) {
