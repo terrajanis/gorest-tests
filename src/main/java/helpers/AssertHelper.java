@@ -7,10 +7,13 @@ import com.github.victools.jsonschema.generator.*;
 import com.github.victools.jsonschema.module.jackson.JacksonModule;
 import com.github.victools.jsonschema.module.javax.validation.JavaxValidationModule;
 import io.restassured.response.Response;
+import models.Errors;
 import org.testng.Assert;
 import org.testng.asserts.SoftAssert;
 import ru.yandex.qatools.allure.annotations.Step;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchema;
@@ -18,7 +21,7 @@ import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchema;
 public class AssertHelper {
 
     @Step("Check a response status code")
-    public static void checkStatusCode(Response response, int expectedStatusCode){
+    public static void checkStatusCode(Response response, int expectedStatusCode) {
         int actualStatusCode = response.getStatusCode();
         Assert.assertEquals(actualStatusCode, expectedStatusCode, "Status code is wrong for the response: " + response.asString());
     }
@@ -51,5 +54,14 @@ public class AssertHelper {
         Assert.assertEquals(firstValue, secondValue, String.format("Values %s и %s are not equal",
                 Objects.isNull(firstValue) ? "null" : firstValue,
                 Objects.isNull(secondValue) ? "null" : secondValue));
+    }
+
+    @Step("Check an error")
+    public static void checkError(Response response, String field, String message) {
+       List<Errors> errors = Arrays.asList(response.as(Errors[].class));
+       final SoftAssert softAssert = new SoftAssert();
+       softAssert.assertEquals(errors.get(0).getField(), field, "Error's fields are not equal");
+        softAssert.assertEquals(errors.get(0).getMessage(), message, "Error's messages are not equal");
+        softAssert.assertAll();
     }
 }

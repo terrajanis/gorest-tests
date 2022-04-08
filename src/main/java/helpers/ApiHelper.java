@@ -21,6 +21,7 @@ public class ApiHelper {
     private static final Logger logger = LogManager.getLogger(ApiHelper.class);
     private static final String APPLICATION_JSON = "application/json";
 
+
     private static void logResponse(Response response) {
         logger.debug("Response code: " + response.getStatusCode());
         logger.debug("Response headers: " + response.getHeaders());
@@ -38,9 +39,10 @@ public class ApiHelper {
     }
 
     @Step("Send post request")
-    public static Response post(String path, Map<String,String> params) {
+    public static Response post(String path, Object o, Map<String,String> headers) {
         Response response = getBaseRequest()
-                .queryParams(params)
+                .headers(headers)
+                .body(o)
                 .post(path);
         logResponse(response);
         return response;

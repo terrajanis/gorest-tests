@@ -19,5 +19,5 @@ public class BaseTest {
     }
 
     protected final String BASE_URL = properties.getProperty("baseUrl");
-    protected final String TOKEN = properties.getProperty("token");
+    protected final String BASE_TOKEN = authProperties.getProperty("token");
 }
