@@ -1,5 +1,6 @@
 package tests;
 
+import database.queries.UsersQueries;
 import helpers.ApiHelper;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
@@ -63,6 +64,8 @@ public class UsersTests extends BaseTest {
         checkResponseJsonSchema(response, User.class);
         userFromResponse = response.as(User.class);
         compareTwoValues(userFromResponse, user);
+        UsersQueries.INSTANCE.addUser(userFromResponse);
+        Assert.assertNotNull(UsersQueries.INSTANCE.getUserByName(userFromResponse.getName()), "User isn't added");
     }
 
     @Test(dataProvider = "usersNegative",
